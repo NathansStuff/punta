@@ -1,0 +1,7 @@
+export enum ERaceClass {
+  MAIDEN = 'MAIDEN',
+  CLAIMING = 'CLAIMING',
+  ALLOWANCE = 'ALLOWANCE',
+  STAKES = 'STAKES',
+  GRADED_STAKES = 'GRADED_STAKES',
+}
