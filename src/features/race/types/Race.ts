@@ -1,7 +1,7 @@
 import { ObjectId, WithId } from 'mongodb';
 import { z } from 'zod';
-import { ETrackCondition } from './ETrackConditon';
 import { ERaceClass } from './ERaceClass';
+import { ETrackCondition } from '@/types/ETrackConditon';
 
 export const Race = z.object({
   name: z.string(),
@@ -11,8 +11,12 @@ export const Race = z.object({
   horses: z.array(
     z.object({
       horseId: z.string(),
-      position: z.number().optional(),
+      barrierDraw: z.number().optional(),
       time: z.number().optional(),
+      jockeyId: z.string().optional(),
+      trainerId: z.string().optional(),
+      finalPosition: z.number().optional(),
+      weight: z.number().optional(),
     })
   ), // Horses with their performance in the race
   class: z.nativeEnum(ERaceClass),

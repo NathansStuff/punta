@@ -1,3 +1,4 @@
+import { ELivingStatus } from '@/types/ELivingStatus';
 import { ObjectId, WithId } from 'mongodb';
 import { z } from 'zod';
 import { EPersonType } from './EPersonType';
@@ -6,6 +7,8 @@ export const Person = z.object({
   firstName: z.string(),
   lastName: z.string(),
   role: z.nativeEnum(EPersonType),
+  dateOfBirth: z.date().optional(),
+  status: z.nativeEnum(ELivingStatus),
   photoUrl: z.string().url().optional(),
   stats: z
     .object({
