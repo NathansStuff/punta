@@ -90,29 +90,105 @@ async function saveRawHTML(page) {
         );
       });
 
-      if (pedigreeItems.length > 0) {
-        // Assign based on their position in the pedigree tree
-        pedigree.paternalGrandfather = pedigreeItems[0].innerText; // Danehill
-        pedigree.paternalGrandmother = pedigreeItems[1].innerText; // Kensington Gardens
-        pedigree.father = pedigreeItems[2]; // Blackfriars
-        pedigree.maternalGrandfather = pedigreeItems[3].innerText; // Bellotto
-        pedigree.maternalGrandmother = pedigreeItems[4].innerText; // Favorita
-        pedigree.mother = pedigreeItems[5].innerText; // Mimicry
-        pedigree.currentHorse = pedigreeItems[6].innerText; // The Temptress
+      function mapIndex(i) {
+        switch (i) {
+          case 0:
+            return 'fathers father';
+          case 1:
+            return 'fathers father father';
+          case 2:
+            return 'fathers father mother';
+          case 3:
+            return 'father';
+          case 4:
+            return 'fathers mother';
+          case 5:
+            return 'fathers mother father';
+          case 6:
+            return 'fathers mother mother';
+          case 7:
+            return 'currentHorse';
+          case 8:
+            return 'mother';
+          case 9:
+            return 'mothers father';
+          case 10:
+            return 'mothers father father';
+          case 11:
+            return 'mothers father mother';
+          case 12:
+            return 'mothers mother';
+          case 13:
+            return 'mothers mother father';
+          case 14:
+            return 'mothers mother mother';
+
+          default:
+            return 'unknown';
+        }
       }
 
-      return { pedigree, debugInfo, extractedItems }; // Return debug and extracted info
+      // Extract all pedigree items
+      pedigreeItems.forEach((pedigreeItem, i) => {
+        extractedItems.push({
+          text: pedigreeItem.innerText,
+          link: pedigreeItem.href,
+          relationship: mapIndex(i),
+          index: i,
+        });
+      });
+
+      return extractedItems; // Return debug and extracted info
     });
 
-    console.log('Debug Info:', response.debugInfo); // Log debug information
-    console.log('Extracted Items:', response.extractedItems); // Log all extracted items
-    return response.pedigree;
+    return response;
   };
 
   const pedigreeInfo = await extractPedigreeInfo(page);
+  console.log('Pedigree Info:', pedigreeInfo);
 
-  // Log the extracted pedigree information
-  console.log('Extracted Pedigree Info:', pedigreeInfo);
+  const horseInfo = await page.evaluate(() => {
+    const info = {};
+
+    // Get all `td` elements
+    const tdElements = document.querySelectorAll('td');
+
+    tdElements.forEach(td => {
+      const text = td.innerText.toLowerCase();
+
+      // Find 'life number:'
+      if (text.includes('life number:')) {
+        info.lifeNumber = text.replace('life number:', '').trim();
+      }
+
+      // Find 'date of birth:'
+      if (text.includes('date of birth:')) {
+        info.dateOfBirth = text.replace('date of birth:', '').trim();
+      }
+
+      // Find 'microchip number'
+      if (text.includes('microchip number:')) {
+        info.microchipNumber = text.replace('microchip number:', '').trim();
+      }
+
+      // Find 'dna typed'
+      if (text.includes('dna typed:')) {
+        info.dnaTyped = text.replace('dna typed:', '').trim();
+      }
+    });
+
+    return info;
+  });
+
+  // Log the extracted information
+  console.log('Extracted Horse Info:', horseInfo);
+
+  const horseName = await page.evaluate(() => {
+    const element = document.querySelector('td.HeaderBlockNasuy');
+    return element ? element.innerText.trim() : null;
+  });
+
+  console.log('Horse Name:', horseName);
 
   // Close the browser manually or let it stay open
   // await browser.close();
