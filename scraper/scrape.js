@@ -84,6 +84,11 @@ async function saveRawHTML(page) {
       debugInfo.push(`Item 0: ${pedigreeItems[0].innerText}`);
 
       // Log every pedigree item text and link for debugging
+      pedigreeItems.forEach((pedigreeItem, i) => {
+        debugInfo.push(
+          `${i} -${pedigreeItem.innerText} - ${pedigreeItem.href}`
+        );
+      });
 
       if (pedigreeItems.length > 0) {
         // Assign based on their position in the pedigree tree
